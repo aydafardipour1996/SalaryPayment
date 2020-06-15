@@ -4,6 +4,11 @@ public class BalanceModel {
     private String DepositNumber;
     private double balance;
 
+    public BalanceModel(String depositNumber, double balance) {
+        DepositNumber = depositNumber;
+        this.balance = balance;
+    }
+
     public void setDepositNumber(String depositNumber) {
         DepositNumber = depositNumber;
     }
