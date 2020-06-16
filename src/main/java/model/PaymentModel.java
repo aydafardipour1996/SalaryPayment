@@ -5,6 +5,12 @@ public class PaymentModel {
     private String depositNumber;
     private double amount;
 
+    public PaymentModel(boolean isDebtor, String depositNumber, double amount) {
+        this.isDebtor = isDebtor;
+        this.depositNumber = depositNumber;
+        this.amount = amount;
+    }
+
     public void setDebtor(boolean debtor) {
         isDebtor = debtor;
     }

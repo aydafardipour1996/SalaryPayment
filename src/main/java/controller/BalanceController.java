@@ -3,10 +3,16 @@ package controller;
 import View.BalanceView;
 import model.BalanceModel;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+
 public class BalanceController {
+
     private BalanceModel balanceModel;
     private BalanceView balanceView;
-
     public BalanceController(BalanceModel balanceModel, BalanceView balanceView) {
         this.balanceModel = balanceModel;
         this.balanceView = balanceView;
@@ -29,6 +35,8 @@ public class BalanceController {
     }
 
     public void updateBalanceView(){
+
+    balanceView.write(balanceModel.getDepositNumber(),balanceModel.getBalance());
 
     }
 }

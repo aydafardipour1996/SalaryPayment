@@ -35,6 +35,6 @@ public class PaymentController {
         return paymentModel.getAmount();
     }
     public void updatePaymentView(){
-
+    paymentView.write(paymentModel.isDebtor(),paymentModel.getDepositNumber(),paymentModel.getAmount());
     }
 }
