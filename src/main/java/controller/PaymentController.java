@@ -4,8 +4,9 @@ import View.PaymentView;
 import model.PaymentModel;
 
 public class PaymentController {
-    private PaymentModel paymentModel;
-    private PaymentView paymentView;
+    private final PaymentModel paymentModel;
+    private final PaymentView paymentView;
+
 
     public PaymentController(PaymentModel paymentModel, PaymentView paymentView) {
         this.paymentModel = paymentModel;
@@ -16,7 +17,7 @@ public class PaymentController {
        paymentModel.setDebtor(isDebtor);
     }
     public boolean isPaymentDebtor(){
-        return paymentModel.isDebtor();
+        return paymentModel.isDebtorSet();
     }
 
     public void setPaymentDepositNumber(String depositNumber){
@@ -34,7 +35,13 @@ public class PaymentController {
     public double getPaymentAmount(){
         return paymentModel.getAmount();
     }
-    public void updatePaymentView(){
-    paymentView.write(paymentModel.isDebtor(),paymentModel.getDepositNumber(),paymentModel.getAmount());
+    public void updatePaymentViewLine(){
+    paymentView.writeLine(paymentModel.isDebtorSet(),paymentModel.getDepositNumber(),paymentModel.getAmount());
+    }
+    public void addDataToView(){
+    paymentView.add(paymentModel.isDebtorSet(),paymentModel.getDepositNumber(),paymentModel.getAmount());
+    }
+    public static void updatePayment(){
+   PaymentView.write();
     }
 }

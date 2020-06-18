@@ -1,6 +1,7 @@
 package controller;
 
 import View.BalanceView;
+import View.TransactionView;
 import model.BalanceModel;
 
 import java.io.IOException;
@@ -34,10 +35,12 @@ public class BalanceController {
         return balanceModel.getBalance();
     }
 
-    public void updateBalanceView(){
 
-    balanceView.write(balanceModel.getDepositNumber(),balanceModel.getBalance());
-
+    public void addDataToView(){
+        balanceView.add(balanceModel.getDepositNumber(),balanceModel.getBalance());
+    }
+    public static void updateBalanceView(){
+        BalanceView.write();
     }
 }
 

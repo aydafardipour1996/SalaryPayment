@@ -8,9 +8,11 @@ import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 
 public class BalanceView {
-    Path path = Paths.get("data/Balance.txt");
-    public void write(String depositNumber, double balance){
-        String tab="\t";
+    private static ArrayList<String> res =new ArrayList<String>();
+    static Path path = Paths.get("data/Balance.txt");
+    String tab="\t";
+/*    public void write(String depositNumber, double balance){
+
         String newLine = System.getProperty("line.separator");
         ArrayList<String> question =new ArrayList<String>(10);
         try {
@@ -20,9 +22,17 @@ public class BalanceView {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }*/
+    public void add(String depositNumber,double amount){
 
+        res.add(depositNumber+tab+amount);
+    }
 
-
-
+    public static void write(){
+        try {
+            Files.write(path,res);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

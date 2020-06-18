@@ -5,6 +5,12 @@ public class TransactionModel {
     private String receiver;
     private double amount;
 
+    public TransactionModel(String sender, String receiver, double amount) {
+        this.sender = sender;
+        this.receiver = receiver;
+        this.amount = amount;
+    }
+
     public void setSender(String sender) {
         this.sender = sender;
     }

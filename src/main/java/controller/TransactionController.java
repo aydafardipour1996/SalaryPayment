@@ -1,5 +1,6 @@
 package controller;
 
+import View.PaymentView;
 import View.TransactionView;
 import model.TransactionModel;
 
@@ -11,6 +12,8 @@ public class TransactionController {
         this.transactionModel = transactionModel;
         this.transactionView = transactionView;
     }
+
+
 
     public void setTransactionSender(String sender) {
         transactionModel.setSender(sender);
@@ -37,7 +40,14 @@ public class TransactionController {
         return transactionModel.getAmount();
     }
 
-    public void updateTransactionView(){
+    public void updateTransactionViewLine(){
+        transactionView.writeLine(transactionModel.getSender(),transactionModel.getReceiver(),transactionModel.getAmount());
+    }
 
+    public void addDataToView(){
+        transactionView.add(transactionModel.getSender(),transactionModel.getReceiver(),transactionModel.getAmount());
+    }
+    public static void updateTransaction(){
+        TransactionView.write();
     }
 }

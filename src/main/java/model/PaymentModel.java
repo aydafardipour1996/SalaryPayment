@@ -15,7 +15,7 @@ public class PaymentModel {
         isDebtor = debtor;
     }
 
-    public boolean isDebtor() {
+    public boolean isDebtorSet() {
         return isDebtor;
     }
 
