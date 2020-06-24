@@ -1,3 +1,4 @@
+import Exceptions.NoDebtorFoundException;
 import model.DepositModel;
 
 import java.io.IOException;
@@ -11,9 +12,6 @@ import java.util.Objects;
 
 public class ReadData {
     private static final BigDecimal ZERO = new BigDecimal(0);
-    private static final int NOT_FOUND = 0;
-    private static final int CHARGED = 1;
-    private static final int NOT_CHARGED = 2;
     static private List<String[]> res = new ArrayList<>(10);
     static private List<DepositModel> depositModels = new ArrayList<>();
 
@@ -38,33 +36,20 @@ public class ReadData {
         return depositModels;
     }
 
-    public int isDebtorCharged(String debtorNumber) {
-        int state = NOT_FOUND;
 
-        for (DepositModel depositModel : depositModels) {
-            if (Objects.equals(depositModel.getDepositNumber(), debtorNumber)) {
-
-                if (depositModel.getAmount().compareTo(ZERO) > 0) {
-                    state = CHARGED;
-                } else {
-                    state = NOT_CHARGED;
-                }
-            }
-
-        }
-        if (state == NOT_FOUND)
-            System.out.println("Debtor not found!!");
-        return state;
-    }
-
-    public BigDecimal getDebtorDeposit(String debtorNumber) {
-        BigDecimal Deposit= new BigDecimal(0) ;
+    public BigDecimal getDebtorDeposit(String debtorNumber) throws NoDebtorFoundException {
+        boolean found = false;
+        BigDecimal Deposit = new BigDecimal(0);
         for (DepositModel depositModel : depositModels) {
             if (Objects.equals(depositModel.getDepositNumber(), debtorNumber)) {
 
                 Deposit = depositModel.getAmount();
+                found = true;
             }
 
+        }
+        if (!found) {
+            throw new NoDebtorFoundException("Debtor not found!!");
         }
         return Deposit;
     }
