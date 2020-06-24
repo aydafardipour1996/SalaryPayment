@@ -1,3 +1,4 @@
+import Exceptions.InsufficientFundsException;
 import View.DepositView;
 import View.PaymentView;
 import View.TransactionView;
@@ -29,11 +30,17 @@ public class Main {
         data.read();
         depositModels = data.addData();
 
-        System.out.println(data.isDebtorCharged(debtorNumber));
+       // System.out.println(data.isDebtorCharged(debtorNumber));
         debtorDeposit = data.getDebtorDeposit(debtorNumber);
 
-        payDept("100.8.8", new BigDecimal(10));
-        payDept("200.0.0", new BigDecimal(40));
+        try {
+            payDept("100.8.8", new BigDecimal(10));
+            payDept("200.0.0", new BigDecimal(40));
+        } catch (InsufficientFundsException e) {
+            System.out.println("not enough balance, you are short "+ e.getAmount());
+            e.printStackTrace();
+        }
+
         PaymentController paymentController = new PaymentController(new PaymentModel(true, debtorNumber, debtorDepositSum), paymentView);
         paymentController.updatePaymentViewLine();
         setDeposit();
@@ -75,7 +82,7 @@ public class Main {
         }
     }
 
-    private static void payDept(String creditorNumber, BigDecimal amount) {
+    private static void payDept (String creditorNumber, BigDecimal amount) throws InsufficientFundsException {
         boolean exists = false;
         if (amount.compareTo(debtorDeposit)<=0 ) {
             setPayment(false, creditorNumber, amount);
@@ -94,7 +101,9 @@ public class Main {
             }
 
         } else {
-            System.out.println("not enough Deposit!!");
+            BigDecimal needs = amount.subtract(debtorDeposit);
+            throw new InsufficientFundsException(needs);
+
         }
 
     }
