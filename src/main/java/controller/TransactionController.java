@@ -1,8 +1,9 @@
 package controller;
 
-import View.PaymentView;
 import View.TransactionView;
 import model.TransactionModel;
+
+import java.math.BigDecimal;
 
 public class TransactionController {
     private TransactionModel transactionModel;
@@ -13,41 +14,40 @@ public class TransactionController {
         this.transactionView = transactionView;
     }
 
+    public static void updateTransaction() {
+        TransactionView.write();
+    }
 
+    public String getTransactionSender() {
+        return transactionModel.getSender();
+    }
 
     public void setTransactionSender(String sender) {
         transactionModel.setSender(sender);
     }
 
-    public String getTransactionSender(){
-        return transactionModel.getSender();
-    }
-
-    public void setTransactionReceiver(String receiver) {
-      transactionModel.setReceiver(receiver);
-    }
-
-    public String getTransactionReceiver(){
+    public String getTransactionReceiver() {
         return transactionModel.getReceiver();
     }
 
-    public void setTransactionAmount(double amount) {
-        transactionModel.setAmount(amount);
+    public void setTransactionReceiver(String receiver) {
+        transactionModel.setReceiver(receiver);
     }
 
-    public double getTransactionAmount(){
+    public BigDecimal getTransactionAmount() {
 
         return transactionModel.getAmount();
     }
 
-    public void updateTransactionViewLine(){
-        transactionView.writeLine(transactionModel.getSender(),transactionModel.getReceiver(),transactionModel.getAmount());
+    public void setTransactionAmount(BigDecimal amount) {
+        transactionModel.setAmount(amount);
     }
 
-    public void addDataToView(){
-        transactionView.add(transactionModel.getSender(),transactionModel.getReceiver(),transactionModel.getAmount());
+    public void updateTransactionViewLine() {
+        transactionView.writeLine(transactionModel.getSender(), transactionModel.getReceiver(), transactionModel.getAmount());
     }
-    public static void updateTransaction(){
-        TransactionView.write();
+
+    public void addDataToView() {
+        transactionView.add(transactionModel.getSender(), transactionModel.getReceiver(), transactionModel.getAmount());
     }
 }

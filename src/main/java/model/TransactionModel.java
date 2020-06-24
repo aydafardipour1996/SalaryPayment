@@ -1,38 +1,40 @@
 package model;
 
+import java.math.BigDecimal;
+
 public class TransactionModel {
-    private String sender;
-    private String receiver;
-    private double amount;
+    private String debtorDepositNumber;
+    private String creditorDepositNumber;
+    private BigDecimal amount;
 
-    public TransactionModel(String sender, String receiver, double amount) {
-        this.sender = sender;
-        this.receiver = receiver;
+    public TransactionModel(String debtorDepositNumber, String creditorDepositNumber, BigDecimal amount) {
+        this.debtorDepositNumber = debtorDepositNumber;
+        this.creditorDepositNumber = creditorDepositNumber;
         this.amount = amount;
-    }
-
-    public void setSender(String sender) {
-        this.sender = sender;
     }
 
     public String getSender() {
-        return sender;
+        return debtorDepositNumber;
     }
 
-    public void setReceiver(String receiver) {
-        this.receiver = receiver;
+    public void setSender(String sender) {
+        this.debtorDepositNumber = sender;
     }
 
     public String getReceiver() {
-        return receiver;
+        return creditorDepositNumber;
     }
 
-    public void setAmount(double amount) {
-        this.amount = amount;
+    public void setReceiver(String receiver) {
+        this.creditorDepositNumber = receiver;
     }
 
-    public double getAmount() {
+    public BigDecimal getAmount() {
         return amount;
+    }
+
+    public void setAmount(BigDecimal amount) {
+        this.amount = amount;
     }
 
 

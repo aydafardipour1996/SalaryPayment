@@ -1,111 +1,109 @@
-import View.BalanceView;
+import View.DepositView;
 import View.PaymentView;
 import View.TransactionView;
-import controller.BalanceController;
+import controller.DepositController;
 import controller.PaymentController;
 import controller.TransactionController;
-import model.BalanceModel;
+import model.DepositModel;
 import model.PaymentModel;
 import model.TransactionModel;
-
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
+import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 public class Main {
 
-    static private ArrayList<String[]> res =new ArrayList<String[]>();
-    static private ArrayList<TransactionModel> transactionModels= new ArrayList<>();
-    static private ArrayList<BalanceModel> balanceModels= new ArrayList<>();
-    static private double debtorBalance;
-    static private double debtorBalanceSum;
-    static private final String debtorNumber="100.1.2";
+    static private final String debtorNumber = "100.1.2";
     static PaymentView paymentView = new PaymentView();
-    static TransactionView transactionView= new TransactionView();
-    public static void main(String[] args)  {
+    static TransactionView transactionView = new TransactionView();
+    static private List<String[]> res = new ArrayList();
+    static private List<TransactionModel> transactionModels = new ArrayList();
+    static private List<DepositModel> depositModels = new ArrayList();
+    static private BigDecimal debtorDeposit;
+    static private BigDecimal debtorDepositSum= new BigDecimal(0);
 
- ReadData data = new ReadData();
- data.read();
- balanceModels=data.addData();
+    public static void main(String[] args) {
 
- System.out.println( data.isDebtorCharged(debtorNumber));
- debtorBalance=data.getDebtorBalance(debtorNumber);
+        ReadData data = new ReadData();
+        data.read();
+        depositModels = data.addData();
 
- payDept("100.8.8",10);
- payDept("200.0.0",40);
- PaymentController paymentController= new PaymentController(new PaymentModel(true,debtorNumber,debtorBalanceSum),paymentView);
- paymentController.updatePaymentViewLine();
- setBalance();
- update();
+        System.out.println(data.isDebtorCharged(debtorNumber));
+        debtorDeposit = data.getDebtorDeposit(debtorNumber);
+
+        payDept("100.8.8", new BigDecimal(10));
+        payDept("200.0.0", new BigDecimal(40));
+        PaymentController paymentController = new PaymentController(new PaymentModel(true, debtorNumber, debtorDepositSum), paymentView);
+        paymentController.updatePaymentViewLine();
+        setDeposit();
+        update();
     }
-private static void setPayment(boolean isDebtor, String depositNumber, double amount)  {
 
-    PaymentModel paymentModel=new PaymentModel(isDebtor,depositNumber,amount);
-    PaymentController paymentController= new PaymentController(paymentModel,paymentView);
-    paymentController.addDataToView();
+    private static void setPayment(boolean isDebtor, String depositNumber, BigDecimal amount) {
+
+        PaymentModel paymentModel = new PaymentModel(isDebtor, depositNumber, amount);
+        PaymentController paymentController = new PaymentController(paymentModel, paymentView);
+        paymentController.addDataToView();
 
 
     }
-private static void update(){
-     PaymentController.updatePayment();
-     TransactionController.updateTransaction();
-     BalanceController.updateBalanceView();
-}
 
-private static void setTransaction(String sender,String receiver, double amount){
-        TransactionModel transactionModel=new TransactionModel(sender,receiver,amount);
-     //   transactionModels.add(transactionModel);
-        TransactionController transactionController=new TransactionController(transactionModel,transactionView);
+    private static void update() {
+        PaymentController.updatePayment();
+        TransactionController.updateTransaction();
+        DepositController.updateDepositView();
+    }
+
+    private static void setTransaction(String sender, String receiver, BigDecimal amount) {
+        TransactionModel transactionModel = new TransactionModel(sender, receiver, amount);
+        //   transactionModels.add(transactionModel);
+        TransactionController transactionController = new TransactionController(transactionModel, transactionView);
         transactionController.addDataToView();
 
-}
-private static void setBalance(){
-        BalanceView balanceView=new BalanceView();
-    for (BalanceModel balanceModel:balanceModels){
-        if (Objects.equals(balanceModel.getDepositNumber(), debtorNumber)){
-           balanceModel.setBalance(debtorBalance);
+    }
 
+    private static void setDeposit() {
+        DepositView depositView = new DepositView();
+        for (DepositModel depositModel : depositModels) {
+            if (Objects.equals(depositModel.getDepositNumber(), debtorNumber)) {
+                depositModel.setAmount(debtorDeposit);
+
+            }
+            DepositController depositController = new DepositController(depositModel, depositView);
+            depositController.addDataToView();
         }
-       BalanceController balanceController=new BalanceController(balanceModel,balanceView) ;
-       balanceController.addDataToView();
-    }
-}
-
-    private static void payDept(String creditorNumber, double amount){
-        boolean exists=false;
-        if (amount <= debtorBalance){
-            setPayment(false,creditorNumber,amount);
-            setTransaction(debtorNumber,creditorNumber,amount);
-            debtorBalance -= amount;
-            debtorBalanceSum +=amount;
-    for (int i =0 ; i<balanceModels.size(); i++){
-
-      if(Objects.equals(balanceModels.get(i).getDepositNumber(), creditorNumber)){
-          balanceModels.get(i).setBalance(balanceModels.get(i).getBalance()+amount);
-          exists=true;
-      }
-    }
-    if(!exists) {
-        balanceModels.add(new BalanceModel(creditorNumber,amount));
     }
 
-        }else {
-            System.out.println("not enough balance!!");
+    private static void payDept(String creditorNumber, BigDecimal amount) {
+        boolean exists = false;
+        if (amount.compareTo(debtorDeposit)<=0 ) {
+            setPayment(false, creditorNumber, amount);
+            setTransaction(debtorNumber, creditorNumber, amount);
+            debtorDeposit = debtorDeposit.subtract(amount);
+            debtorDepositSum =debtorDepositSum.add(amount);
+            for (int i = 0; i < depositModels.size(); i++) {
+
+                if (Objects.equals(depositModels.get(i).getDepositNumber(), creditorNumber)) {
+                    depositModels.get(i).setAmount(depositModels.get(i).getAmount().add(amount));
+                    exists = true;
+                }
+            }
+            if (!exists) {
+                depositModels.add(new DepositModel(creditorNumber, amount));
+            }
+
+        } else {
+            System.out.println("not enough Deposit!!");
         }
 
     }
 
-/*private static BalanceModel readBalance(String number){
-    Path balancePath = Paths.get("data/Balance.txt");
+/*private static DepositModel readDeposit(String number){
+    Path DepositPath = Paths.get("data/Deposit.txt");
     try {
 
-        Files.lines(balancePath)
+        Files.lines(DepositPath)
                 .filter(line -> line.startsWith(number)).forEach(line -> {
        String s=line;
         });

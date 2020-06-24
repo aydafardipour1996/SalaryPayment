@@ -1,11 +1,13 @@
 package model;
 
+import java.math.BigDecimal;
+
 public class PaymentModel {
     private boolean isDebtor;
     private String depositNumber;
-    private double amount;
+    private BigDecimal amount;
 
-    public PaymentModel(boolean isDebtor, String depositNumber, double amount) {
+    public PaymentModel(boolean isDebtor, String depositNumber, BigDecimal amount) {
         this.isDebtor = isDebtor;
         this.depositNumber = depositNumber;
         this.amount = amount;
@@ -19,23 +21,21 @@ public class PaymentModel {
         return isDebtor;
     }
 
-    public void setDepositNumber(String depositNumber) {
-        this.depositNumber = depositNumber;
-    }
-
     public String getDepositNumber() {
         return depositNumber;
     }
 
-    public void setAmount(double amount) {
-        this.amount = amount;
+    public void setDepositNumber(String depositNumber) {
+        this.depositNumber = depositNumber;
     }
 
-    public double getAmount() {
+    public BigDecimal getAmount() {
         return amount;
     }
 
-
+    public void setAmount(BigDecimal amount) {
+        this.amount = amount;
+    }
 
 
 }
