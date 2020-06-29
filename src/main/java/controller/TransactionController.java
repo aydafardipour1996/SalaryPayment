@@ -2,36 +2,45 @@ package controller;
 
 import View.TransactionView;
 import model.TransactionModel;
+import sevices.WriteToFileService;
 
 import java.math.BigDecimal;
 
 public class TransactionController {
+    String tab = "\t";
     private TransactionModel transactionModel;
     private TransactionView transactionView;
+    private WriteToFileService service;
 
-    public TransactionController(TransactionModel transactionModel, TransactionView transactionView) {
+    public TransactionController() {
+
+    }
+
+    public TransactionController(TransactionModel transactionModel, TransactionView transactionView, WriteToFileService service) {
         this.transactionModel = transactionModel;
         this.transactionView = transactionView;
+        this.service = service;
     }
 
-    public static void updateTransaction() {
-        TransactionView.write();
+    public void updateTransaction() {
+        WriteToFileService.writeTransaction();
     }
 
-    public String getTransactionSender() {
-        return transactionModel.getSender();
+
+    public String getTransactionDebtorDepositNumber() {
+        return transactionModel.getDebtorDepositNumber();
     }
 
-    public void setTransactionSender(String sender) {
-        transactionModel.setSender(sender);
+    public void setTransactionDebtorDepositNumber(String debtorDepositNumber) {
+        transactionModel.setDebtorDepositNumber(debtorDepositNumber);
     }
 
-    public String getTransactionReceiver() {
-        return transactionModel.getReceiver();
+    public String getTransactionCreditorDepositNumber() {
+        return transactionModel.getCreditorDepositNumber();
     }
 
-    public void setTransactionReceiver(String receiver) {
-        transactionModel.setReceiver(receiver);
+    public void setTransactionCreditorDepositNumber(String CreditorDepositNumber) {
+        transactionModel.setCreditorDepositNumber(CreditorDepositNumber);
     }
 
     public BigDecimal getTransactionAmount() {
@@ -44,10 +53,11 @@ public class TransactionController {
     }
 
     public void updateTransactionViewLine() {
-        transactionView.writeLine(transactionModel.getSender(), transactionModel.getReceiver(), transactionModel.getAmount());
+        transactionView.writeLine(transactionModel.getDebtorDepositNumber(), transactionModel.getCreditorDepositNumber(), transactionModel.getAmount());
     }
 
     public void addDataToView() {
-        transactionView.add(transactionModel.getSender(), transactionModel.getReceiver(), transactionModel.getAmount());
+        transactionView.add(transactionModel.getDebtorDepositNumber(), transactionModel.getCreditorDepositNumber(), transactionModel.getAmount());
+        service.addTransaction(transactionModel.getDebtorDepositNumber(), transactionModel.getCreditorDepositNumber(), transactionModel.getAmount());
     }
 }

@@ -2,20 +2,26 @@ package controller;
 
 import View.PaymentView;
 import model.PaymentModel;
+import sevices.WriteToFileService;
+
 import java.math.BigDecimal;
 
 public class PaymentController {
-    private final PaymentModel paymentModel;
-    private final PaymentView paymentView;
+    private PaymentModel paymentModel;
+    private PaymentView paymentView;
+    private WriteToFileService service;
 
-
-    public PaymentController(PaymentModel paymentModel, PaymentView paymentView) {
-        this.paymentModel = paymentModel;
-        this.paymentView = paymentView;
+    public PaymentController() {
     }
 
-    public static void updatePayment() {
-        PaymentView.write();
+    public PaymentController(PaymentModel paymentModel, PaymentView paymentView, WriteToFileService service) {
+        this.paymentModel = paymentModel;
+        this.paymentView = paymentView;
+        this.service = service;
+    }
+
+    public void updatePayment() {
+        WriteToFileService.writePayment();
     }
 
     public boolean isPaymentDebtor() {
@@ -48,5 +54,6 @@ public class PaymentController {
 
     public void addDataToView() {
         paymentView.add(paymentModel.isDebtorSet(), paymentModel.getDepositNumber(), paymentModel.getAmount());
+        service.addPayment(paymentModel.isDebtorSet(), paymentModel.getDepositNumber(), paymentModel.getAmount());
     }
 }

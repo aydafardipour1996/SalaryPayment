@@ -2,21 +2,27 @@ package controller;
 
 import View.DepositView;
 import model.DepositModel;
+import sevices.WriteToFileService;
 
 import java.math.BigDecimal;
 
 public class DepositController {
 
-    private final DepositModel depositModel;
-    private final DepositView depositView;
+    private DepositModel depositModel;
+    private DepositView depositView;
+    private WriteToFileService service;
 
-    public DepositController(DepositModel depositModel, DepositView depositView) {
-        this.depositModel = depositModel;
-        this.depositView = depositView;
+    public DepositController() {
     }
 
-    public static void updateDepositView() {
-        DepositView.write();
+    public DepositController(DepositModel depositModel, DepositView depositView, WriteToFileService service) {
+        this.depositModel = depositModel;
+        this.depositView = depositView;
+        this.service = service;
+    }
+
+    public void updateDepositView() {
+        WriteToFileService.writeDeposit();
     }
 
     public String getDepositDepositNumber() {
@@ -37,6 +43,7 @@ public class DepositController {
 
     public void addDataToView() {
         depositView.add(depositModel.getDepositNumber(), depositModel.getAmount());
+        service.addDeposit(depositModel.getDepositNumber(), depositModel.getAmount());
     }
 }
 
