@@ -60,6 +60,7 @@ public class Main {
         try {
             payDept("100.8.8", new BigDecimal(10));
             payDept("200.0.0", new BigDecimal(40));
+            payDept("200.0.0", new BigDecimal(30));
         } catch (InsufficientFundsException e) {
             System.out.println("not enough balance, you are short " + e.getAmount());
             e.printStackTrace();
