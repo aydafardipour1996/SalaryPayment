@@ -1,4 +1,6 @@
-import Exceptions.NoDebtorFoundException;
+package sevices;
+
+import exceptions.NoDebtorFoundException;
 import model.DepositModel;
 
 import java.io.IOException;
@@ -6,7 +8,6 @@ import java.math.BigDecimal;
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousFileChannel;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
@@ -17,12 +18,14 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 public class ReadData {
+    static Path pathTransaction = Paths.get("data/Transaction.txt");
+    static Path pathPayment = Paths.get("data/Payment.txt");
+    static Path pathDeposit = Paths.get("data/Deposit.txt");
     private static final BigDecimal ZERO = new BigDecimal(0);
-    static private List<String[]> res = new ArrayList<>(10);
     static private List<DepositModel> depositModels = new ArrayList<>();
 
-    public void readFile() throws IOException, InterruptedException, ExecutionException {
-        Path path = Paths.get("data/Deposit.txt");
+    public String[] readFile(Path path) throws IOException, InterruptedException, ExecutionException {
+        //   Path path = Paths.get("data/Deposit.txt");
         AsynchronousFileChannel channel = AsynchronousFileChannel.open(path, StandardOpenOption.READ);
         ByteBuffer buffer = ByteBuffer.allocate(400);
         Future<Integer> result = channel.read(buffer, 0); // position = 0
@@ -34,20 +37,32 @@ public class ReadData {
 
         byte[] b = new byte[buffer.remaining()];
         buffer.get(b);
-        String a = new String(b, StandardCharsets.UTF_8);
-
-
-        String[] line = a.split("\\n");
-        for (int i = 0; i < line.length; i++) {
-            res.add(line[i].split("\\t"));
-        }
-
-
+        String res = new String(b, StandardCharsets.UTF_8);
+        String[] line = res.split("\\n");
         buffer.clear();
         channel.close();
+        return line;
     }
 
-    public void read() {
+    public List<DepositModel> addDepositData() {
+        String[] line= new String[0];
+        try {
+            line = readFile(pathDeposit);
+        } catch (IOException | InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
+        for (int i = 0; i < line.length; i++) {
+            String[] stringArray = line[i].split("\\t");
+            depositModels.add(new DepositModel(stringArray[0], new BigDecimal(stringArray[1].replaceAll("\\s+", ""))));
+
+
+        }
+
+        return depositModels;
+
+    }
+
+/*    public void read() {
         Path DepositPath = Paths.get("data/Deposit.txt");
 
         try {
@@ -59,14 +74,8 @@ public class ReadData {
         }
 
 
-    }
+    }*/
 
-    public List<DepositModel> addData() {
-        for (String[] l : res) {
-            depositModels.add(new DepositModel(l[0], new BigDecimal(l[1].replaceAll("\\s+", ""))));
-        }
-        return depositModels;
-    }
 
 
     public BigDecimal getDebtorDeposit(String debtorNumber) throws NoDebtorFoundException {

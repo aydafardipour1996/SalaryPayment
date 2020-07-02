@@ -1,6 +1,6 @@
 package controller;
 
-import View.PaymentView;
+import view.PaymentView;
 import model.PaymentModel;
 import sevices.WriteToFileService;
 

@@ -1,4 +1,4 @@
-package View;
+package view;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -13,6 +13,7 @@ public class DepositView {
     String tab = "\t";
 
     public static void write() {
+
         try {
             Files.write(path, res);
         } catch (IOException e) {

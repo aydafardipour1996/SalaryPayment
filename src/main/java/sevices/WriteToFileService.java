@@ -84,8 +84,8 @@ public class WriteToFileService {
         options.add(StandardOpenOption.CREATE);
         options.add(StandardOpenOption.APPEND);
         try {
-           // writeFile(transactionRes, pathTransaction, true);
-            writeFileChannel(pathTransaction,transactionRes,options);
+            // writeFile(transactionRes, pathTransaction, true);
+            writeFileChannel(pathTransaction, transactionRes, options);
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -97,7 +97,7 @@ public class WriteToFileService {
         options.add(StandardOpenOption.CREATE);
         options.add(StandardOpenOption.APPEND);
         try {
-        writeFileChannel(pathPayment,paymentRes,options);
+            writeFileChannel(pathPayment, paymentRes, options);
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -1,6 +1,6 @@
 package controller;
 
-import View.DepositView;
+import view.DepositView;
 import model.DepositModel;
 import sevices.WriteToFileService;
 

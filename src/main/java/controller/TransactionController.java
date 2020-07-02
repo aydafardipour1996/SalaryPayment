@@ -1,6 +1,6 @@
 package controller;
 
-import View.TransactionView;
+import view.TransactionView;
 import model.TransactionModel;
 import sevices.WriteToFileService;
 
