@@ -53,7 +53,7 @@ public class WriteToFileService {
         fileChannel.close();
     }
 
-    private static void writeFile(List<String> res, Path path, boolean append) throws IOException {
+    private static void writeFile(List<String> res, Path path) throws IOException {
         String input = "";
         for (int i = 0; i < res.size(); i++) {
             input = input + res.get(i) + newLine;
@@ -95,9 +95,8 @@ public class WriteToFileService {
     public static void writePayment() {
         Set<StandardOpenOption> options = new HashSet<>();
         options.add(StandardOpenOption.CREATE);
-        options.add(StandardOpenOption.APPEND);
         try {
-            writeFileChannel(pathPayment, paymentRes, options);
+            writeFile(paymentRes, pathPayment);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -105,7 +104,8 @@ public class WriteToFileService {
 
     public static void writeDeposit() {
         try {
-            writeFile(depositRes, pathDeposit, false);
+            writeFile(depositRes, pathDeposit);
+            depositRes.clear();
         } catch (IOException e) {
             e.printStackTrace();
         }

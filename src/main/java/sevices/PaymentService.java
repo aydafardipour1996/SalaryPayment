@@ -23,19 +23,31 @@ public class PaymentService {
     static PaymentView paymentView = new PaymentView();
     static TransactionView transactionView = new TransactionView();
     static TransactionController transactionController;
-    static PaymentController paymentController;
     static DepositController depositController;
     static private List<DepositModel> depositModels = new ArrayList();
+    static private List<PaymentModel> paymentModels = new ArrayList();
     static private BigDecimal debtorDeposit;
     static private BigDecimal debtorDepositSum = BigDecimal.ZERO;
 
     public static void check() {
 
-        ReadData data = new ReadData();
+        ReadDataService data = new ReadDataService();
+
+        if (!data.depositFileExists()) {
+
+            DepositService depositService = new DepositService();
+            depositService.setDepositData();
+
+        }
+
+        CalculationService calculation = new CalculationService();
+        calculation.calculatePayments();
+
         depositModels = data.addDepositData();
+        paymentModels = data.addPaymentData();
+
 
         transactionController = new TransactionController();
-        paymentController = new PaymentController();
         depositController = new DepositController();
 
 
@@ -47,9 +59,13 @@ public class PaymentService {
         }
 
         try {
-            payDept("100.8.8", new BigDecimal(10));
-            payDept("200.0.0", new BigDecimal(40));
-            payDept("200.0.0", new BigDecimal(30));
+            for (PaymentModel paymentModel : paymentModels) {
+                if (!paymentModel.isDebtorSet()) {
+                    payDept(paymentModel.getDepositNumber(), paymentModel.getAmount());
+                }
+
+            }
+
         } catch (InsufficientFundsException e) {
             System.out.println("not enough balance, you are short " + e.getAmount());
             e.printStackTrace();
@@ -63,15 +79,8 @@ public class PaymentService {
 
     }
 
-    private static void setPayment(boolean isDebtor, String depositNumber, BigDecimal amount) {
-
-        PaymentModel paymentModel = new PaymentModel(isDebtor, depositNumber, amount);
-        PaymentController paymentController = new PaymentController(paymentModel, paymentView, new WriteToFileService());
-        paymentController.addDataToView();
-    }
 
     public static void update() {
-        paymentController.updatePayment();
         depositController.updateDepositView();
         transactionController.updateTransaction();
     }
@@ -98,10 +107,10 @@ public class PaymentService {
     public static void payDept(String creditorNumber, BigDecimal amount) throws InsufficientFundsException {
         boolean exists = false;
         if (amount.compareTo(debtorDeposit) <= 0) {
-            setPayment(false, creditorNumber, amount);
+
             setTransaction(debtorNumber, creditorNumber, amount);
             debtorDeposit = debtorDeposit.subtract(amount);
-            debtorDepositSum = debtorDepositSum.add(amount);
+
             for (DepositModel depositModel : depositModels) {
 
                 if (Objects.equals(depositModel.getDepositNumber(), creditorNumber)) {
@@ -120,6 +129,8 @@ public class PaymentService {
         }
 
     }
+
 }
+
 
 
