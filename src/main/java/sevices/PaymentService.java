@@ -1,16 +1,10 @@
 package sevices;
 
-import controller.DepositController;
-import controller.PaymentController;
-import controller.TransactionController;
 import exceptions.InsufficientFundsException;
 import exceptions.NoDebtorFoundException;
 import model.DepositModel;
 import model.PaymentModel;
 import model.TransactionModel;
-import view.DepositView;
-import view.PaymentView;
-import view.TransactionView;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -20,14 +14,9 @@ import java.util.Objects;
 public class PaymentService {
 
     static private final String debtorNumber = "100.1.2";
-    static PaymentView paymentView = new PaymentView();
-    static TransactionView transactionView = new TransactionView();
-    static TransactionController transactionController;
-    static DepositController depositController;
+    static private final BigDecimal debtorDepositSum = BigDecimal.ZERO;
     static private List<DepositModel> depositModels = new ArrayList();
-    static private List<PaymentModel> paymentModels = new ArrayList();
     static private BigDecimal debtorDeposit;
-    static private BigDecimal debtorDepositSum = BigDecimal.ZERO;
 
     public static void check() {
 
@@ -44,11 +33,10 @@ public class PaymentService {
         calculation.calculatePayments();
 
         depositModels = data.addDepositData();
-        paymentModels = data.addPaymentData();
+        List<PaymentModel> paymentModels = data.addPaymentData();
 
 
-        transactionController = new TransactionController();
-        depositController = new DepositController();
+
 
 
         try {
@@ -67,40 +55,41 @@ public class PaymentService {
             }
 
         } catch (InsufficientFundsException e) {
-            System.out.println("not enough balance, you are short " + e.getAmount());
+
             e.printStackTrace();
         }
 
-        PaymentController paymentController = new PaymentController(new PaymentModel(true, debtorNumber, debtorDepositSum), paymentView, new WriteToFileService());
+        PaymentModel paymentModel = new PaymentModel(true, debtorNumber, debtorDepositSum);
 
         if (!debtorDepositSum.equals(BigDecimal.ZERO)) {
-            paymentController.updatePaymentViewLine();
+            WriteToFileService writeToFileService = new WriteToFileService();
+            writeToFileService.addPayment(paymentModel);
         }
 
     }
 
 
     public static void update() {
-        depositController.updateDepositView();
-        transactionController.updateTransaction();
+        WriteToFileService.updateDeposit();
+        WriteToFileService.updateTransaction();
     }
 
     private static void setTransaction(String sender, String receiver, BigDecimal amount) {
         TransactionModel transactionModel = new TransactionModel(sender, receiver, amount);
-        TransactionController transactionController = new TransactionController(transactionModel, transactionView, new WriteToFileService());
-        transactionController.addDataToView();
+        WriteToFileService writeToFileService=new WriteToFileService();
+        writeToFileService.addTransaction(transactionModel);
 
     }
 
     public static void setDeposit() {
-        DepositView depositView = new DepositView();
+
         for (DepositModel depositModel : depositModels) {
             if (Objects.equals(depositModel.getDepositNumber(), debtorNumber)) {
                 depositModel.setAmount(debtorDeposit);
 
             }
-            DepositController depositController = new DepositController(depositModel, depositView, new WriteToFileService());
-            depositController.addDataToView();
+            WriteToFileService writeToFileService = new WriteToFileService();
+            writeToFileService.addDeposit(depositModel);
         }
     }
 
@@ -124,7 +113,7 @@ public class PaymentService {
 
         } else {
             BigDecimal needs = amount.subtract(debtorDeposit);
-            throw new InsufficientFundsException(needs);
+            throw new InsufficientFundsException("not enough balance!! " + needs + " short!", needs);
 
         }
 

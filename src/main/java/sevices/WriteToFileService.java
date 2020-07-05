@@ -1,12 +1,12 @@
 package sevices;
 
+import model.DepositModel;
+import model.PaymentModel;
+import model.TransactionModel;
+
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.nio.ByteBuffer;
-import java.nio.channels.AsynchronousFileChannel;
-import java.nio.channels.CompletionHandler;
 import java.nio.channels.FileChannel;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
@@ -22,29 +22,13 @@ public class WriteToFileService {
     static List<String> transactionRes = new ArrayList<>();
     static List<String> paymentRes = new ArrayList<>();
     static List<String> depositRes = new ArrayList<>();
-    static String transactions = "";
-    static String deposits = "";
-    static String payments = "";
     static String newLine = System.getProperty("line.separator");
-    String tab = "\t";
 
-    private static void write(Path path, List<String> res, boolean append) {
-
-        try {
-            if (append) {
-                Files.write(path, res, StandardOpenOption.APPEND, StandardOpenOption.CREATE);
-            } else {
-                Files.write(path, res, StandardOpenOption.CREATE);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
     public static void writeFileChannel(Path path, List<String> res, Set<StandardOpenOption> options) throws IOException {
         String input = "";
-        for (int i = 0; i < res.size(); i++) {
-            input = input + res.get(i) + newLine;
+        for (String re : res) {
+            input = input + re + newLine;
         }
         byte[] byteArray = input.getBytes();
         ByteBuffer buffer = ByteBuffer.wrap(byteArray);
@@ -53,38 +37,13 @@ public class WriteToFileService {
         fileChannel.close();
     }
 
-    private static void writeFile(List<String> res, Path path) throws IOException {
-        String input = "";
-        for (int i = 0; i < res.size(); i++) {
-            input = input + res.get(i) + newLine;
-        }
-        byte[] byteArray = input.getBytes();
-        ByteBuffer buffer = ByteBuffer.wrap(byteArray);
 
-        AsynchronousFileChannel channel;
-        channel = AsynchronousFileChannel.open(path, StandardOpenOption.WRITE, StandardOpenOption.CREATE);
-        CompletionHandler handler = new CompletionHandler() {
-            @Override
-            public void completed(Object result, Object attachment) {
-                System.out.println(attachment + " completed and " + result + " bytes are written.");
-            }
-
-            @Override
-            public void failed(Throwable exc, Object attachment) {
-                System.out.println(attachment + " failed with exception:");
-                exc.printStackTrace();
-            }
-        };
-        channel.write(buffer, 0, "Async Task", handler);
-        channel.close();
-    }
-
-    public static void writeTransaction() {
+    public static void updateTransaction() {
         Set<StandardOpenOption> options = new HashSet<>();
         options.add(StandardOpenOption.CREATE);
         options.add(StandardOpenOption.APPEND);
         try {
-            // writeFile(transactionRes, pathTransaction, true);
+
             writeFileChannel(pathTransaction, transactionRes, options);
 
         } catch (IOException e) {
@@ -92,44 +51,48 @@ public class WriteToFileService {
         }
     }
 
-    public static void writePayment() {
+    public static void updatePayment() {
         Set<StandardOpenOption> options = new HashSet<>();
         options.add(StandardOpenOption.CREATE);
+        options.add(StandardOpenOption.WRITE);
         try {
-            writeFile(paymentRes, pathPayment);
+            writeFileChannel(pathPayment, paymentRes, options);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public static void writeDeposit() {
+    public static void updateDeposit() {
+
+        Set<StandardOpenOption> options = new HashSet<>();
+        options.add(StandardOpenOption.CREATE);
+        options.add(StandardOpenOption.WRITE);
         try {
-            writeFile(depositRes, pathDeposit);
+
+            writeFileChannel(pathDeposit, depositRes, options);
             depositRes.clear();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public void addTransaction(String sender, String receiver, BigDecimal amount) {
+    public void addTransaction(TransactionModel transactionModel) {
 
-        transactionRes.add(sender + tab + receiver + tab + amount);
-
-    }
-
-    public void addPayment(boolean isDebtor, String depositNumber, BigDecimal amount) {
-        if (isDebtor) {
-            paymentRes.add("debtor" + tab + depositNumber + tab + amount);
-
-        } else
-            paymentRes.add("creditor" + tab + depositNumber + tab + amount);
+        transactionRes.add(transactionModel.toString());
 
     }
 
-    public void addDeposit(String depositNumber, BigDecimal amount) {
+    public void addPayment(PaymentModel paymentModel) {
 
-        depositRes.add(depositNumber + tab + amount);
+        paymentRes.add(paymentModel.toString());
+
+    }
+
+    public void addDeposit(DepositModel depositModel) {
+
+        depositRes.add(depositModel.toString());
 
 
     }
+
 }

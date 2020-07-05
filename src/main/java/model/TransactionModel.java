@@ -37,4 +37,10 @@ public class TransactionModel {
     public BigDecimal getAmount() {
         return amount;
     }
+
+    @Override
+    public String toString() {
+        String tab = "\t";
+        return debtorDepositNumber + tab + creditorDepositNumber + tab + amount;
+    }
 }

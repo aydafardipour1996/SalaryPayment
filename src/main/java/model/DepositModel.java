@@ -3,20 +3,20 @@ package model;
 import java.math.BigDecimal;
 
 public class DepositModel {
-    private String DepositNumber;
+    private String depositNumber;
     private BigDecimal amount;
 
     public DepositModel(String depositNumber, BigDecimal amount) {
-        DepositNumber = depositNumber;
+        this.depositNumber = depositNumber;
         this.amount = amount;
     }
 
     public String getDepositNumber() {
-        return DepositNumber;
+        return depositNumber;
     }
 
     public void setDepositNumber(String depositNumber) {
-        DepositNumber = depositNumber;
+        depositNumber = depositNumber;
     }
 
     public BigDecimal getAmount() {
@@ -27,5 +27,10 @@ public class DepositModel {
         this.amount = amount;
     }
 
+    @Override
+    public String toString() {
+        String tab = "\t";
+        return depositNumber + tab + amount;
+    }
 
 }
