@@ -39,26 +39,36 @@ public class WriteToFileService {
 
 
     public static void updateTransaction() {
+
         Set<StandardOpenOption> options = new HashSet<>();
         options.add(StandardOpenOption.CREATE);
         options.add(StandardOpenOption.APPEND);
+
         try {
 
             writeFileChannel(pathTransaction, transactionRes, options);
 
         } catch (IOException e) {
+
             e.printStackTrace();
+
         }
     }
 
     public static void updatePayment() {
+
         Set<StandardOpenOption> options = new HashSet<>();
         options.add(StandardOpenOption.CREATE);
         options.add(StandardOpenOption.WRITE);
+
         try {
+
             writeFileChannel(pathPayment, paymentRes, options);
+
         } catch (IOException e) {
+
             e.printStackTrace();
+
         }
     }
 
@@ -67,12 +77,15 @@ public class WriteToFileService {
         Set<StandardOpenOption> options = new HashSet<>();
         options.add(StandardOpenOption.CREATE);
         options.add(StandardOpenOption.WRITE);
+
         try {
 
             writeFileChannel(pathDeposit, depositRes, options);
             depositRes.clear();
+
         } catch (IOException e) {
             e.printStackTrace();
+
         }
     }
 
@@ -91,7 +104,6 @@ public class WriteToFileService {
     public void addDeposit(DepositModel depositModel) {
 
         depositRes.add(depositModel.toString());
-
 
     }
 

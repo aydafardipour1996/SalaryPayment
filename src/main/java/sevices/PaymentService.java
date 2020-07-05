@@ -14,7 +14,6 @@ import java.util.Objects;
 public class PaymentService {
 
     static private final String debtorNumber = "100.1.2";
-    static private final BigDecimal debtorDepositSum = BigDecimal.ZERO;
     static private List<DepositModel> depositModels = new ArrayList();
     static private BigDecimal debtorDeposit;
 
@@ -34,9 +33,6 @@ public class PaymentService {
 
         depositModels = data.addDepositData();
         List<PaymentModel> paymentModels = data.addPaymentData();
-
-
-
 
 
         try {
@@ -59,12 +55,6 @@ public class PaymentService {
             e.printStackTrace();
         }
 
-        PaymentModel paymentModel = new PaymentModel(true, debtorNumber, debtorDepositSum);
-
-        if (!debtorDepositSum.equals(BigDecimal.ZERO)) {
-            WriteToFileService writeToFileService = new WriteToFileService();
-            writeToFileService.addPayment(paymentModel);
-        }
 
     }
 
@@ -76,7 +66,7 @@ public class PaymentService {
 
     private static void setTransaction(String sender, String receiver, BigDecimal amount) {
         TransactionModel transactionModel = new TransactionModel(sender, receiver, amount);
-        WriteToFileService writeToFileService=new WriteToFileService();
+        WriteToFileService writeToFileService = new WriteToFileService();
         writeToFileService.addTransaction(transactionModel);
 
     }

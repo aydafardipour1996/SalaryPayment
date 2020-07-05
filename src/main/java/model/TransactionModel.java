@@ -13,34 +13,36 @@ public class TransactionModel {
         this.amount = amount;
     }
 
-
-    public void setDebtorDepositNumber(String debtorDepositNumber) {
-        this.debtorDepositNumber = debtorDepositNumber;
-    }
-
     public String getDebtorDepositNumber() {
         return debtorDepositNumber;
     }
 
-    public void setCreditorDepositNumber(String creditorDepositNumber) {
-        this.creditorDepositNumber = creditorDepositNumber;
+    public void setDebtorDepositNumber(String debtorDepositNumber) {
+        this.debtorDepositNumber = debtorDepositNumber;
     }
 
     public String getCreditorDepositNumber() {
         return creditorDepositNumber;
     }
 
-    public void setAmount(BigDecimal amount) {
-        this.amount = amount;
+    public void setCreditorDepositNumber(String creditorDepositNumber) {
+        this.creditorDepositNumber = creditorDepositNumber;
     }
 
     public BigDecimal getAmount() {
         return amount;
     }
 
+    public void setAmount(BigDecimal amount) {
+        this.amount = amount;
+    }
+
     @Override
     public String toString() {
+
         String tab = "\t";
+
         return debtorDepositNumber + tab + creditorDepositNumber + tab + amount;
+
     }
 }

@@ -9,10 +9,15 @@ public class CalculationService {
 
     public void calculatePayments() {
         //some calculations
-        setPayment(true, "100.1.2", new BigDecimal(100));
-        setPayment(false, "100.1.4", new BigDecimal(20));
-        setPayment(false, "100.1.6", new BigDecimal(50));
-        setPayment(false, "100.1.7", new BigDecimal(30));
+        int limit = 100;
+        int value = 10;
+        setPayment(true, "100.1.2", new BigDecimal(limit * value));
+
+        for (int deposit = 0; deposit < limit; deposit++) {
+
+            setPayment(false, "10.20.100." + deposit, new BigDecimal(value));
+
+        }
 
         WriteToFileService.updatePayment();
     }

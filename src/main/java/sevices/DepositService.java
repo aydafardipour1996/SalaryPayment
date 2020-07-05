@@ -8,11 +8,14 @@ public class DepositService {
 
 
     public void setDepositData() {
-        setDeposit("100.1.2", new BigDecimal(1000));
-        setDeposit("100.1.3", new BigDecimal(0));
-        setDeposit("100.1.5", new BigDecimal(0));
-        setDeposit("100.1.6", new BigDecimal(10));
 
+        setDeposit("100.1.2", new BigDecimal(100000));
+
+        for (int deposit = 0; deposit < 1000; deposit++) {
+
+            setDeposit("10.20.100." + deposit, new BigDecimal(10));
+
+        }
         WriteToFileService.updateDeposit();
     }
 

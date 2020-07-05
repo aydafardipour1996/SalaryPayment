@@ -16,7 +16,7 @@ public class DepositModel {
     }
 
     public void setDepositNumber(String depositNumber) {
-        depositNumber = depositNumber;
+        this.depositNumber = depositNumber;
     }
 
     public BigDecimal getAmount() {
@@ -29,8 +29,11 @@ public class DepositModel {
 
     @Override
     public String toString() {
+
         String tab = "\t";
+
         return depositNumber + tab + amount;
+
     }
 
 }

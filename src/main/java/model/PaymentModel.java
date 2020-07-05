@@ -39,14 +39,20 @@ public class PaymentModel {
 
     @Override
     public String toString() {
+
         String tab = "\t";
         String paymentString;
+
         if (isDebtor) {
+
             paymentString = "debtor" + tab + depositNumber + tab + amount;
 
         } else {
+
             paymentString = "creditor" + tab + depositNumber + tab + amount;
+
         }
+
         return paymentString;
     }
 }
