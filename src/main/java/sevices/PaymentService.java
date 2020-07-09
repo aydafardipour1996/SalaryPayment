@@ -83,16 +83,10 @@ public class PaymentService {
         T0.start();
 
 
-        //  calculation.calculatePayments();
-
         T3.start();
         T1.start();
 
-  /*      try {
-            wait(2000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }*/
+
         try {
 
             T1.join();
@@ -103,8 +97,6 @@ public class PaymentService {
             e.printStackTrace();
         }
 
-       // T00.start();
-      //  T4.start();
         try {
             countDownLatch.await();
         } catch (InterruptedException e) {
@@ -112,27 +104,11 @@ public class PaymentService {
         }
         depositModels = T3.getDeposit();
         List<PaymentModel> paymentModels = T1.getPayment();
-        /*    try {*/
 
-/*            T00.join();
-            System.out.println("lamazhab00");
-            T4.join();
-            System.out.println("lamazhab4");
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }*/
         debtorDeposit = depositModels.get(0).getAmount();
         for (PaymentModel paymentModel : paymentModels) {
             System.out.println("lalalalal" + paymentModel);
         }
-
-/*        try {
-
-            debtorDeposit = data.getDebtorDeposit(debtorNumber);
-        } catch (NoDebtorFoundException e) {
-            e.printStackTrace();
-            System.out.println(e.getMessage());
-        }*/
 
         try {
             for (PaymentModel paymentModel : paymentModels) {
