@@ -40,7 +40,7 @@ public class ReadDataService {
         byte[] b = new byte[buffer.remaining()];
         buffer.get(b);
         String res = new String(b, StandardCharsets.UTF_8);
-        System.out.println(res);
+       // System.out.println(res);
         String[] line = res.split("\\n");
 
         buffer.clear();

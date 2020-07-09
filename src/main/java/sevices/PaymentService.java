@@ -1,7 +1,6 @@
 package sevices;
 
 import exceptions.InsufficientFundsException;
-import exceptions.NoDebtorFoundException;
 import model.DepositModel;
 import model.PaymentModel;
 import model.TransactionModel;
@@ -10,54 +9,15 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.CountDownLatch;
 
 public class PaymentService {
 
     static private final String debtorNumber = "100.1.2";
+    static CalculationService calculation = new CalculationService();
+    static DepositService depositService = new DepositService();
     static private List<DepositModel> depositModels = new ArrayList();
     static private BigDecimal debtorDeposit;
-
-    public static void check() {
-
-        ReadDataService data = new ReadDataService();
-
-        if (!data.depositFileExists()) {
-
-            DepositService depositService = new DepositService();
-            depositService.setDepositData();
-
-        }
-
-        CalculationService calculation = new CalculationService();
-        calculation.calculatePayments();
-
-        depositModels = data.addDepositData();
-        List<PaymentModel> paymentModels = data.addPaymentData();
-
-
-        try {
-            debtorDeposit = data.getDebtorDeposit(debtorNumber);
-        } catch (NoDebtorFoundException e) {
-            e.printStackTrace();
-            System.out.println(e.getMessage());
-        }
-
-        try {
-            for (PaymentModel paymentModel : paymentModels) {
-                if (!paymentModel.isDebtorSet()) {
-                    payDept(paymentModel.getDepositNumber(), paymentModel.getAmount());
-                }
-
-            }
-
-        } catch (InsufficientFundsException e) {
-
-            e.printStackTrace();
-        }
-
-
-    }
-
 
     public static void update() {
         WriteToFileService.updateDeposit();
@@ -106,6 +66,87 @@ public class PaymentService {
             throw new InsufficientFundsException("not enough balance!! " + needs + " short!", needs);
 
         }
+
+    }
+
+    public void check() {
+        CountDownLatch countDownLatch = new CountDownLatch(2);
+        ThreadDemo2 T2 = new ThreadDemo2("Thread Deposit2 ", depositService);
+        ThreadDemo3 T3 = new ThreadDemo3("Thread Deposit3 ", depositService, countDownLatch);
+        //DepositListThread T4 = new DepositListThread("Thread Deposit3 ", depositService,countDownLatch);
+
+        T2.start();
+
+        ThreadDemo0 T0 = new ThreadDemo0("Thread Payment0", calculation);
+        ThreadDemo1 T1 = new ThreadDemo1("Thread Payment1", calculation, countDownLatch);
+        //  PaymentListThread T00 = new PaymentListThread("Thread Payment00", calculation,countDownLatch);
+        T0.start();
+
+
+        //  calculation.calculatePayments();
+
+        T3.start();
+        T1.start();
+
+  /*      try {
+            wait(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }*/
+        try {
+
+            T1.join();
+            System.out.println("lamazhab1");
+            T3.join();
+            System.out.println("lamazhab3");
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+       // T00.start();
+      //  T4.start();
+        try {
+            countDownLatch.await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        depositModels = T3.getDeposit();
+        List<PaymentModel> paymentModels = T1.getPayment();
+        /*    try {*/
+
+/*            T00.join();
+            System.out.println("lamazhab00");
+            T4.join();
+            System.out.println("lamazhab4");
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }*/
+        debtorDeposit = depositModels.get(0).getAmount();
+        for (PaymentModel paymentModel : paymentModels) {
+            System.out.println("lalalalal" + paymentModel);
+        }
+
+/*        try {
+
+            debtorDeposit = data.getDebtorDeposit(debtorNumber);
+        } catch (NoDebtorFoundException e) {
+            e.printStackTrace();
+            System.out.println(e.getMessage());
+        }*/
+
+        try {
+            for (PaymentModel paymentModel : paymentModels) {
+                if (!paymentModel.isDebtorSet()) {
+                    payDept(paymentModel.getDepositNumber(), paymentModel.getAmount());
+                }
+
+            }
+
+        } catch (InsufficientFundsException e) {
+
+            e.printStackTrace();
+        }
+
 
     }
 

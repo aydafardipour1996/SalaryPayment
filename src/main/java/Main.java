@@ -5,10 +5,11 @@ public class Main {
 
     public static void main(String[] args) {
 
-
-        PaymentService.check();
+        PaymentService paymentService = new PaymentService();
+        paymentService.check();
         PaymentService.setDeposit();
         PaymentService.update();
+
     }
 
 
