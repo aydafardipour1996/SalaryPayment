@@ -7,8 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DepositService {
+    public List<DepositModel> depositModels = new ArrayList<>();
     ReadDataService dataService = new ReadDataService();
-public List<DepositModel> depositModels = new ArrayList<>();
     private boolean flag = false;
 
     public synchronized void setDepositData() {
@@ -52,7 +52,7 @@ public List<DepositModel> depositModels = new ArrayList<>();
         }
 
 
-        depositModels=dataService.addDepositData();
+        depositModels = dataService.addDepositData();
         flag = false;
         notify();
 

@@ -1,10 +1,8 @@
 package sevices;
 
-import Threads.CalculationThread;
-import Threads.ReadDepositsThread;
-import Threads.ReadPaymentsThread;
-import Threads.WriteDepositThread;
+import Threads.*;
 import exceptions.InsufficientFundsException;
+import exceptions.NoDebtorFoundException;
 import model.DepositModel;
 import model.PaymentModel;
 import model.TransactionModel;
@@ -24,8 +22,10 @@ public class PaymentService {
     static private BigDecimal debtorDeposit;
 
     public static void update() {
-        WriteToFileService.updateDeposit();
-        WriteToFileService.updateTransaction();
+        WriteTransactionsThread writeTransactionsThread = new WriteTransactionsThread("transaction");
+        UpdateDepositThread updateDepositThread = new UpdateDepositThread("update deposit");
+        writeTransactionsThread.start();
+        updateDepositThread.start();
     }
 
     private static void setTransaction(String sender, String receiver, BigDecimal amount) {
@@ -51,7 +51,7 @@ public class PaymentService {
         boolean exists = false;
         if (amount.compareTo(debtorDeposit) <= 0) {
 
-            setTransaction(debtorNumber, creditorNumber, amount);
+
             debtorDeposit = debtorDeposit.subtract(amount);
 
             for (DepositModel depositModel : depositModels) {
@@ -70,10 +70,10 @@ public class PaymentService {
             throw new InsufficientFundsException("not enough balance!! " + needs + " short!", needs);
 
         }
-
+        setTransaction(debtorNumber, creditorNumber, amount);
     }
 
-    public void check() {
+    public void check() throws NoDebtorFoundException {
         CountDownLatch countDownLatch = new CountDownLatch(2);
         WriteDepositThread T2 = new WriteDepositThread("Thread Deposit2 ", depositService);
         ReadDepositsThread T3 = new ReadDepositsThread("Thread Deposit3 ", depositService, countDownLatch);
@@ -92,26 +92,26 @@ public class PaymentService {
 
 
         try {
-
-            T1.join();
-            T3.join();
-
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        try {
             countDownLatch.await();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
         depositModels = T3.getDeposit();
         List<PaymentModel> paymentModels = T1.getPayment();
-
-        debtorDeposit = depositModels.get(0).getAmount();
+        boolean found = false;
+        for (DepositModel depositModel : depositModels) {
+            if (depositModel.getDepositNumber().equals(debtorNumber)) {
+                debtorDeposit = depositModel.getAmount();
+                found = true;
+            }
+        }
+        if (!found) {
+            throw new NoDebtorFoundException("Debtor not found!!");
+        }
 
 
         try {
+
             for (PaymentModel paymentModel : paymentModels) {
                 if (!paymentModel.isDebtorSet()) {
                     payDept(paymentModel.getDepositNumber(), paymentModel.getAmount());
