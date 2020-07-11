@@ -1,12 +1,13 @@
-package sevices;
+package Threads;
 
 import model.DepositModel;
+import sevices.DepositService;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
-class ThreadDemo3 extends Thread {
+public class ReadDepositsThread extends Thread {
     DepositService deposit;
     boolean isDone = false;
     List<DepositModel> depositModels = new ArrayList<>();
@@ -14,7 +15,7 @@ class ThreadDemo3 extends Thread {
     private Thread t;
     private String threadName;
 
-    ThreadDemo3(String name, DepositService deposit, CountDownLatch countDownLatch) {
+    public ReadDepositsThread(String name, DepositService deposit, CountDownLatch countDownLatch) {
         threadName = name;
         this.deposit = deposit;
         this.countDownLatch = countDownLatch;

@@ -1,5 +1,9 @@
 package sevices;
 
+import Threads.CalculationThread;
+import Threads.ReadDepositsThread;
+import Threads.ReadPaymentsThread;
+import Threads.WriteDepositThread;
 import exceptions.InsufficientFundsException;
 import model.DepositModel;
 import model.PaymentModel;
@@ -71,15 +75,15 @@ public class PaymentService {
 
     public void check() {
         CountDownLatch countDownLatch = new CountDownLatch(2);
-        ThreadDemo2 T2 = new ThreadDemo2("Thread Deposit2 ", depositService);
-        ThreadDemo3 T3 = new ThreadDemo3("Thread Deposit3 ", depositService, countDownLatch);
-        //DepositListThread T4 = new DepositListThread("Thread Deposit3 ", depositService,countDownLatch);
+        WriteDepositThread T2 = new WriteDepositThread("Thread Deposit2 ", depositService);
+        ReadDepositsThread T3 = new ReadDepositsThread("Thread Deposit3 ", depositService, countDownLatch);
+
 
         T2.start();
 
-        ThreadDemo0 T0 = new ThreadDemo0("Thread Payment0", calculation);
-        ThreadDemo1 T1 = new ThreadDemo1("Thread Payment1", calculation, countDownLatch);
-        //  PaymentListThread T00 = new PaymentListThread("Thread Payment00", calculation,countDownLatch);
+        CalculationThread T0 = new CalculationThread("Thread Payment0", calculation);
+        ReadPaymentsThread T1 = new ReadPaymentsThread("Thread Payment1", calculation, countDownLatch);
+
         T0.start();
 
 
