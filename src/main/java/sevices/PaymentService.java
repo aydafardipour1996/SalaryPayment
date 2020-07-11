@@ -94,9 +94,8 @@ public class PaymentService {
         try {
 
             T1.join();
-            System.out.println("lamazhab1");
             T3.join();
-            System.out.println("lamazhab3");
+
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -110,9 +109,7 @@ public class PaymentService {
         List<PaymentModel> paymentModels = T1.getPayment();
 
         debtorDeposit = depositModels.get(0).getAmount();
-        for (PaymentModel paymentModel : paymentModels) {
-            System.out.println("lalalalal" + paymentModel);
-        }
+
 
         try {
             for (PaymentModel paymentModel : paymentModels) {
