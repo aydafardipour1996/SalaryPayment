@@ -1,6 +1,9 @@
 package sevices;
 
-import Threads.*;
+import Threads.ReadDepositsThread;
+import Threads.ReadPaymentsThread;
+import Threads.UpdateDepositThread;
+import Threads.WriteTransactionsThread;
 import exceptions.InsufficientFundsException;
 import exceptions.NoDebtorFoundException;
 import model.DepositModel;
@@ -12,20 +15,25 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class PaymentService {
 
     static private final String debtorNumber = "100.1.2";
     static CalculationService calculation = new CalculationService();
     static DepositService depositService = new DepositService();
+    static ExecutorService executor = Executors.newFixedThreadPool(5);
     static private List<DepositModel> depositModels = new ArrayList();
     static private BigDecimal debtorDeposit;
 
     public static void update() {
+
         WriteTransactionsThread writeTransactionsThread = new WriteTransactionsThread("transaction");
         UpdateDepositThread updateDepositThread = new UpdateDepositThread("update deposit");
-        writeTransactionsThread.start();
-        updateDepositThread.start();
+        executor.execute(writeTransactionsThread);
+        executor.execute(updateDepositThread);
+        executor.shutdown();
     }
 
     private static void setTransaction(String sender, String receiver, BigDecimal amount) {
@@ -74,30 +82,25 @@ public class PaymentService {
     }
 
     public void check() throws NoDebtorFoundException {
+        depositService.setDepositData();
+        calculation.calculatePayments();
+
         CountDownLatch countDownLatch = new CountDownLatch(2);
-        WriteDepositThread T2 = new WriteDepositThread("Thread Deposit2 ", depositService);
-        ReadDepositsThread T3 = new ReadDepositsThread("Thread Deposit3 ", depositService, countDownLatch);
+
+        ReadDepositsThread readDepositsThread = new ReadDepositsThread("Thread Deposit3 ", depositService, countDownLatch);
+        ReadPaymentsThread readPaymentsThread = new ReadPaymentsThread("Thread Payment1", calculation, countDownLatch);
 
 
-        T2.start();
-
-        CalculationThread T0 = new CalculationThread("Thread Payment0", calculation);
-        ReadPaymentsThread T1 = new ReadPaymentsThread("Thread Payment1", calculation, countDownLatch);
-
-        T0.start();
-
-
-        T3.start();
-        T1.start();
-
+        executor.execute(readDepositsThread);
+        executor.execute(readPaymentsThread);
 
         try {
             countDownLatch.await();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        depositModels = T3.getDeposit();
-        List<PaymentModel> paymentModels = T1.getPayment();
+        depositModels = readDepositsThread.getDeposit();
+        List<PaymentModel> paymentModels = readPaymentsThread.getPayment();
         boolean found = false;
         for (DepositModel depositModel : depositModels) {
             if (depositModel.getDepositNumber().equals(debtorNumber)) {

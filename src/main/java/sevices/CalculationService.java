@@ -8,17 +8,10 @@ import java.util.List;
 
 public class CalculationService {
     public List<PaymentModel> paymentModels = new ArrayList<>();
-    boolean flag = false;
 
-    public synchronized void calculatePayments() {
+
+    public void calculatePayments() {
         //some calculations
-        if (flag) {
-            try {
-                wait();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
 
 
         int limit = 10;
@@ -28,12 +21,12 @@ public class CalculationService {
         for (int deposit = 0; deposit < limit; deposit++) {
 
             setPayment(false, "10.20.100." + deposit, new BigDecimal(value));
-            System.out.println("setting Payment");
+    
         }
 
         WriteToFileService.updatePayment();
-        flag = true;
-        notify();
+
+
     }
 
     private void setPayment(boolean isDebtor, String depositNumber, BigDecimal amount) {
@@ -45,29 +38,13 @@ public class CalculationService {
 
     }
 
-    public synchronized List<PaymentModel> addPaymentData() {
+    public List<PaymentModel> addPaymentData() {
 
-        if (!flag) {
-            try {
-                wait();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
 
         ReadDataService dataService = new ReadDataService();
         paymentModels = dataService.addPaymentData();
-        flag = false;
-        notify();
-
 
         return paymentModels;
-    }
-
-    public synchronized List<PaymentModel> getPayment() {
-
-        return paymentModels;
-
     }
 
 

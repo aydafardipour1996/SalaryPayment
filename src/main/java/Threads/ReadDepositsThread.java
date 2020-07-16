@@ -7,12 +7,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
-public class ReadDepositsThread extends Thread {
+public class ReadDepositsThread implements Runnable {
     DepositService deposit;
-    boolean isDone = false;
     List<DepositModel> depositModels = new ArrayList<>();
     CountDownLatch countDownLatch;
-    private Thread t;
     private String threadName;
 
     public ReadDepositsThread(String name, DepositService deposit, CountDownLatch countDownLatch) {
@@ -26,16 +24,8 @@ public class ReadDepositsThread extends Thread {
         depositModels = deposit.getDeposits();
         countDownLatch.countDown();
 
-        System.out.println("Thread " + threadName + " exiting.");
     }
 
-    public void start() {
-        System.out.println("Starting " + threadName);
-        if (t == null) {
-            t = new Thread(this, threadName);
-            t.start();
-        }
-    }
 
     public List<DepositModel> getDeposit() {
         return depositModels;

@@ -30,9 +30,6 @@ public class ReadDataService {
         ByteBuffer buffer = ByteBuffer.allocate((int) Files.size(path));
         Future<Integer> result = channel.read(buffer, 0);
         while (!result.isDone()) {
-
-            System.out.println("Task of reading file is in progress asynchronously.");
-
         }
 
         buffer.flip();
