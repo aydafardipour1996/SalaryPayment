@@ -15,11 +15,11 @@ public class DepositService {
 
 
         if (!dataService.depositFileExists()) {
-            setDeposit("100.1.2", new BigDecimal(1000));
+            setDeposit("100.1.2", new BigDecimal(500));
 
-            for (int deposit = 0; deposit < 10; deposit++) {
+            for (int deposit = 0; deposit < 20; deposit++) {
 
-                setDeposit("10.20.100." + deposit, new BigDecimal(10));
+                setDeposit("10.20.100." + deposit, new BigDecimal(5));
 
             }
             WriteToFileService.updateDeposit();

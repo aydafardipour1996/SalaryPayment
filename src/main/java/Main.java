@@ -12,7 +12,7 @@ public class Main {
         } catch (NoDebtorFoundException e) {
             e.printStackTrace();
         }
-        PaymentService.setDeposit();
+        PaymentService.setDebtorDeposit();
         PaymentService.update();
 
     }

@@ -14,8 +14,8 @@ public class CalculationService {
         //some calculations
 
 
-        int limit = 10;
-        int value = 10;
+        int limit = 20;
+        int value = 2;
         setPayment(true, "100.1.2", new BigDecimal(limit * value));
 
         for (int deposit = 0; deposit < limit; deposit++) {

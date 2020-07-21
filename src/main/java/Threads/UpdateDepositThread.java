@@ -13,7 +13,7 @@ public class UpdateDepositThread implements Runnable {
 
     public void run() {
         WriteToFileService.updateDeposit();
-
+        System.out.println("done  " + threadName );
     }
 
 

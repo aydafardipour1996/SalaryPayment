@@ -22,6 +22,7 @@ public class ReadDepositsThread implements Runnable {
     public void run() {
 
         depositModels = deposit.getDeposits();
+        System.out.println("done  " + threadName );
         countDownLatch.countDown();
 
     }

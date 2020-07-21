@@ -23,6 +23,7 @@ public class ReadPaymentsThread implements Runnable {
     public void run() {
 
         paymentModels = calculation.addPaymentData();
+        System.out.println("done  " + threadName );
         countDownLatch.countDown();
 
     }

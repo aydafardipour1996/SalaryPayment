@@ -14,6 +14,7 @@ public class WriteTransactionsThread implements Runnable {
 
     public void run() {
         WriteToFileService.updateTransaction();
+        System.out.println("done  " + threadName );
     }
 
 
