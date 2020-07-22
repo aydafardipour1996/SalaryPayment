@@ -14,16 +14,17 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class WriteToFileService {
     static Path pathTransaction = Paths.get("data/Transaction.txt");
     static Path pathPayment = Paths.get("data/Payment.txt");
     static Path pathDeposit = Paths.get("data/Deposit.txt");
-    static List<String> transactionRes = new ArrayList<>();
+    static List<String> transactionRes = new CopyOnWriteArrayList<>();
     static List<String> paymentRes = new ArrayList<>();
-    static List<String> depositRes = new ArrayList<>();
+    static List<String> depositRes = new CopyOnWriteArrayList<>();
     static String newLine = System.getProperty("line.separator");
-
+int i =0;
 
     public static void writeFileChannel(Path path, List<String> res, Set<StandardOpenOption> options) throws IOException {
         String input = "";
@@ -45,7 +46,9 @@ public class WriteToFileService {
         options.add(StandardOpenOption.APPEND);
 
         try {
-
+for (String transactionModel:transactionRes){
+    System.out.println("******" + transactionModel);
+}
             writeFileChannel(pathTransaction, transactionRes, options);
 
         } catch (IOException e) {
@@ -92,6 +95,7 @@ public class WriteToFileService {
     public void addTransaction(TransactionModel transactionModel) {
 
         transactionRes.add(transactionModel.toString());
+
 
     }
 

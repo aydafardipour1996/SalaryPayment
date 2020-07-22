@@ -3,25 +3,22 @@ package sevices;
 import model.PaymentModel;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 
 public class CalculationService {
-    public List<PaymentModel> paymentModels = new ArrayList<>();
-
+    public int limit = 10;
 
     public void calculatePayments() {
         //some calculations
 
 
-        int limit = 20;
-        int value = 2;
+        int value = 10;
         setPayment(true, "100.1.2", new BigDecimal(limit * value));
 
         for (int deposit = 0; deposit < limit; deposit++) {
 
             setPayment(false, "10.20.100." + deposit, new BigDecimal(value));
-    
+
         }
 
         WriteToFileService.updatePayment();
@@ -42,7 +39,7 @@ public class CalculationService {
 
 
         ReadDataService dataService = new ReadDataService();
-        paymentModels = dataService.addPaymentData();
+        List<PaymentModel> paymentModels = dataService.addPaymentData();
 
         return paymentModels;
     }

@@ -1,9 +1,8 @@
 package sevices;
 
+import Threads.PaymentThread;
 import Threads.ReadDepositsThread;
 import Threads.ReadPaymentsThread;
-import Threads.UpdateDepositThread;
-import Threads.WriteTransactionsThread;
 import exceptions.InsufficientFundsException;
 import exceptions.NoDebtorFoundException;
 import model.DepositModel;
@@ -11,47 +10,52 @@ import model.PaymentModel;
 import model.TransactionModel;
 
 import java.math.BigDecimal;
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class PaymentService {
 
     static private final String debtorNumber = "100.1.2";
     static CalculationService calculation = new CalculationService();
     static DepositService depositService = new DepositService();
-    static ExecutorService executor = Executors.newFixedThreadPool(5);
+    static ExecutorService executor = Executors.newFixedThreadPool(10);
     static private List<DepositModel> depositModels = new ArrayList();
     static private BigDecimal debtorDeposit;
+    private CountDownLatch countDown = new CountDownLatch(calculation.limit);
 
     public static void update() {
 
-        WriteTransactionsThread writeTransactionsThread = new WriteTransactionsThread("transaction");
-        UpdateDepositThread updateDepositThread = new UpdateDepositThread("update deposit");
-        executor.execute(writeTransactionsThread);
-        executor.execute(updateDepositThread);
-        executor.shutdown();
+        WriteToFileService.updateTransaction();
+        WriteToFileService.updateDeposit();
+
     }
 
     private static void setTransaction(String sender, String receiver, BigDecimal amount) {
         TransactionModel transactionModel = new TransactionModel(sender, receiver, amount);
         WriteToFileService writeToFileService = new WriteToFileService();
+
         writeToFileService.addTransaction(transactionModel);
 
+        System.out.println("transacted " + receiver);
     }
 
     public static void setDebtorDeposit() {
-        executor.execute(() -> {
-            System.out.println("deposit set");
-            for (DepositModel depositModel : depositModels) {
-                if (Objects.equals(depositModel.getDepositNumber(), debtorNumber)) {
 
-                    depositModel.setAmount(debtorDeposit);
+        System.out.println("deposit set: " + debtorDeposit);
+        for (DepositModel depositModel : depositModels) {
+            if (Objects.equals(depositModel.getDepositNumber(), debtorNumber)) {
 
-                }
-                WriteToFileService writeToFileService = new WriteToFileService();
-                writeToFileService.addDeposit(depositModel);
+                depositModel.setAmount(debtorDeposit);
+
             }
-        });
+            WriteToFileService writeToFileService = new WriteToFileService();
+            writeToFileService.addDeposit(depositModel);
+        }
+
 
     }
 
@@ -78,10 +82,13 @@ public class PaymentService {
             throw new InsufficientFundsException("not enough balance!! " + needs + " short!", needs);
 
         }
+        System.out.println("payed " + creditorNumber);
+
         setTransaction(debtorNumber, creditorNumber, amount);
     }
 
     public void check() throws NoDebtorFoundException {
+
         depositService.setDepositData();
         calculation.calculatePayments();
 
@@ -111,45 +118,27 @@ public class PaymentService {
         if (!found) {
             throw new NoDebtorFoundException("Debtor not found!!");
         }
-        Set<Callable<String>> callables = new HashSet<Callable<String>>();
 
 
         for (PaymentModel paymentModel : paymentModels) {
             if (!paymentModel.isDebtorSet()) {
-
-                callables.add(() -> {
-                    try {
-                        payDept(paymentModel.getDepositNumber(), paymentModel.getAmount());
-                        System.out.println("payed " + paymentModel.getDepositNumber());
-                    } catch (InsufficientFundsException e) {
-                        e.printStackTrace();
-                    }
-                    return "done";
-                });
+                System.out.println("######" + paymentModel.getDepositNumber());
+                PaymentThread paymentThread = new PaymentThread(countDown, paymentModel.getDepositNumber(), paymentModel.getAmount());
+                executor.execute(paymentThread);
 
 
             }
 
         }
 
-        List<Future<String>> futures = null;
+
         try {
-            futures = executor.invokeAll(callables);
+            countDown.await();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        executor.shutdown();
         boolean done = false;
-/*        for (Future<String> future : futures) {
-            try {
-                if (future.get().equals("done")) {
-                    done = true;
-                } else {
-                    done = false;
-                }
-            } catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
-            }
-        }*/
 
 
     }
