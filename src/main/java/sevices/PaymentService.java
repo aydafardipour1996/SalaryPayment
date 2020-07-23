@@ -1,8 +1,6 @@
 package sevices;
 
 import Threads.PaymentThread;
-import Threads.ReadDepositsThread;
-import Threads.ReadPaymentsThread;
 import exceptions.InsufficientFundsException;
 import exceptions.NoDebtorFoundException;
 import model.DepositModel;
@@ -92,22 +90,10 @@ public class PaymentService {
         depositService.setDepositData();
         calculation.calculatePayments();
 
-        CountDownLatch countDownLatch = new CountDownLatch(2);
-
-        ReadDepositsThread readDepositsThread = new ReadDepositsThread("Thread Deposit3 ", depositService, countDownLatch);
-        ReadPaymentsThread readPaymentsThread = new ReadPaymentsThread("Thread Payment1", calculation, countDownLatch);
 
 
-        executor.execute(readDepositsThread);
-        executor.execute(readPaymentsThread);
-
-        try {
-            countDownLatch.await();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        depositModels = readDepositsThread.getDeposit();
-        List<PaymentModel> paymentModels = readPaymentsThread.getPayment();
+        depositModels = depositService.getDeposits();
+        List<PaymentModel> paymentModels = calculation.addPaymentData();
         boolean found = false;
         for (DepositModel depositModel : depositModels) {
             if (depositModel.getDepositNumber().equals(debtorNumber)) {
