@@ -24,7 +24,7 @@ public class WriteToFileService {
     static List<String> paymentRes = new ArrayList<>();
     static List<String> depositRes = new CopyOnWriteArrayList<>();
     static String newLine = System.getProperty("line.separator");
-int i =0;
+    int i = 0;
 
     public static void writeFileChannel(Path path, List<String> res, Set<StandardOpenOption> options) throws IOException {
         String input = "";
@@ -46,9 +46,7 @@ int i =0;
         options.add(StandardOpenOption.APPEND);
 
         try {
-for (String transactionModel:transactionRes){
-    System.out.println("******" + transactionModel);
-}
+
             writeFileChannel(pathTransaction, transactionRes, options);
 
         } catch (IOException e) {

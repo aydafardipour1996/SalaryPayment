@@ -6,6 +6,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public class CalculationService {
+
     public int limit = 10;
 
     public void calculatePayments() {

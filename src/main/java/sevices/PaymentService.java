@@ -40,12 +40,12 @@ public class PaymentService {
 
         writeToFileService.addTransaction(transactionModel);
 
-        System.out.println("transacted " + receiver);
+
     }
 
     public static void setDebtorDeposit() {
 
-        System.out.println("deposit set: " + debtorDeposit);
+
         for (DepositModel depositModel : depositModels) {
             if (Objects.equals(depositModel.getDepositNumber(), debtorNumber)) {
 
@@ -82,7 +82,7 @@ public class PaymentService {
             throw new InsufficientFundsException("not enough balance!! " + needs + " short!", needs);
 
         }
-        System.out.println("payed " + creditorNumber);
+
 
         setTransaction(debtorNumber, creditorNumber, amount);
     }
@@ -122,7 +122,7 @@ public class PaymentService {
 
         for (PaymentModel paymentModel : paymentModels) {
             if (!paymentModel.isDebtorSet()) {
-                System.out.println("######" + paymentModel.getDepositNumber());
+
                 PaymentThread paymentThread = new PaymentThread(countDown, paymentModel.getDepositNumber(), paymentModel.getAmount());
                 executor.execute(paymentThread);
 
@@ -138,7 +138,6 @@ public class PaymentService {
             e.printStackTrace();
         }
         executor.shutdown();
-        boolean done = false;
 
 
     }
