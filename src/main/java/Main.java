@@ -1,6 +1,8 @@
 import exceptions.NoDebtorFoundException;
 import sevices.PaymentService;
 
+import java.io.IOException;
+
 
 public class Main {
 
@@ -9,11 +11,10 @@ public class Main {
         PaymentService paymentService = new PaymentService();
         try {
             paymentService.check();
-        } catch (NoDebtorFoundException e) {
+        } catch (NoDebtorFoundException | IOException e) {
             e.printStackTrace();
         }
-        PaymentService.setDebtorDeposit();
-        PaymentService.update();
+
 
     }
 

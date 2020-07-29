@@ -7,10 +7,11 @@ import model.DepositModel;
 import model.PaymentModel;
 import model.TransactionModel;
 
+import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -20,45 +21,52 @@ public class PaymentService {
     static private final String debtorNumber = "100.1.2";
     static CalculationService calculation = new CalculationService();
     static DepositService depositService = new DepositService();
-    static ExecutorService executor = Executors.newFixedThreadPool(10);
-    static private List<DepositModel> depositModels = new ArrayList();
+    static ExecutorService executor = Executors.newFixedThreadPool(20);
+    static long position = 0;
+    static Long lastPosition;
+    static String space = "               ";
+    static private List<DepositModel> depositModels = new CopyOnWriteArrayList<>();
     static private BigDecimal debtorDeposit;
-    private CountDownLatch countDown = new CountDownLatch(calculation.limit);
+    private CountDownLatch countDown = new CountDownLatch(calculation.limit - calculation.start);
 
-    public static void update() {
 
-        WriteToFileService.updateTransaction();
-        WriteToFileService.updateDeposit();
-
-    }
-
-    private static void setTransaction(String sender, String receiver, BigDecimal amount) {
+    private synchronized static void setTransaction(String sender, String receiver, BigDecimal amount) {
         TransactionModel transactionModel = new TransactionModel(sender, receiver, amount);
-        WriteToFileService writeToFileService = new WriteToFileService();
 
-        writeToFileService.addTransaction(transactionModel);
-
-
-    }
-
-    public static void setDebtorDeposit() {
+        try {
+            WriteToFileService.writeFileChannelLine(transactionModel.toString(), WriteToFileService.transactionFileChannel);
 
 
-        for (DepositModel depositModel : depositModels) {
-            if (Objects.equals(depositModel.getDepositNumber(), debtorNumber)) {
+        } catch (IOException e) {
 
-                depositModel.setAmount(debtorDeposit);
+            e.printStackTrace();
 
-            }
-            WriteToFileService writeToFileService = new WriteToFileService();
-            writeToFileService.addDeposit(depositModel);
         }
 
 
     }
 
-    public static void payDept(String creditorNumber, BigDecimal amount) throws InsufficientFundsException {
+    public static void setDebtorDeposit() throws IOException {
+
+
+        for (DepositModel depositModel : depositModels) {
+            if (Objects.equals(depositModel.getDepositNumber(), debtorNumber)) {
+
+                depositModel.setDeposit(debtorDeposit);
+
+            }
+            WriteToFileService.updateFileChannelLine(depositModel.toString() + space, depositModel.getPosition());
+
+        }
+
+
+    }
+
+    public static synchronized void payDept(String creditorNumber, BigDecimal amount) throws InsufficientFundsException, IOException {
         boolean exists = false;
+
+        String newLine = System.getProperty("line.separator");
+
         if (amount.compareTo(debtorDeposit) <= 0) {
 
 
@@ -66,13 +74,26 @@ public class PaymentService {
 
             for (DepositModel depositModel : depositModels) {
 
+
                 if (Objects.equals(depositModel.getDepositNumber(), creditorNumber)) {
-                    depositModel.setAmount(depositModel.getAmount().add(amount));
+
+
+                    depositModel.setDeposit(depositModel.getDeposit().add(amount));
+
                     exists = true;
+
+
+                    WriteToFileService.updateFileChannelLine(depositModel.toString(), depositModel.getPosition());
+
+
                 }
             }
             if (!exists) {
-                depositModels.add(new DepositModel(creditorNumber, amount));
+                lastPosition = WriteToFileService.getPosition();
+                DepositModel depositModel = new DepositModel(creditorNumber, amount, lastPosition);
+                depositModels.add(depositModel);
+                WriteToFileService.updateFileChannelLine(depositModel.toString() + space + newLine, depositModel.getPosition());
+                WriteToFileService.writeFileChannelLine(depositModel.positionString(), WriteToFileService.positionFileChannel);
             }
 
         } else {
@@ -85,25 +106,30 @@ public class PaymentService {
         setTransaction(debtorNumber, creditorNumber, amount);
     }
 
-    public void check() throws NoDebtorFoundException {
+    public void check() throws NoDebtorFoundException, IOException {
 
         depositService.setDepositData();
         calculation.calculatePayments();
 
 
-
         depositModels = depositService.getDeposits();
         List<PaymentModel> paymentModels = calculation.addPaymentData();
         boolean found = false;
+
         for (DepositModel depositModel : depositModels) {
             if (depositModel.getDepositNumber().equals(debtorNumber)) {
-                debtorDeposit = depositModel.getAmount();
+                debtorDeposit = depositModel.getDeposit();
                 found = true;
             }
         }
         if (!found) {
             throw new NoDebtorFoundException("Debtor not found!!");
         }
+
+
+        WriteToFileService.openTransactionChannel();
+        WriteToFileService.openDepositChannel();
+        WriteToFileService.openPositionChannel();
 
 
         for (PaymentModel paymentModel : paymentModels) {
@@ -123,10 +149,14 @@ public class PaymentService {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+
         executor.shutdown();
+        setDebtorDeposit();
+        WriteToFileService.closeChannels();
 
 
     }
+
 
 }
 

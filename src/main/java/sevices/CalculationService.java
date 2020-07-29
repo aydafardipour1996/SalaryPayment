@@ -2,36 +2,47 @@ package sevices;
 
 import model.PaymentModel;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
 
 public class CalculationService {
 
-    public int limit = 10;
+    public int limit = 20;
+    public int start = 10;
 
-    public void calculatePayments() {
+    public void calculatePayments() throws IOException {
+        if (ReadDataService.paymentFileExists()) {
+            ReadDataService.removePayments();
+        }
         //some calculations
+
+        WriteToFileService.openPaymentChannel();
 
 
         int value = 10;
-        setPayment(true, "100.1.2", new BigDecimal(limit * value));
+        setPayment(true, "100.1.2", new BigDecimal((limit - start) * value));
 
-        for (int deposit = 0; deposit < limit; deposit++) {
+        for (int deposit = start; deposit < limit; deposit++) {
 
             setPayment(false, "10.20.100." + deposit, new BigDecimal(value));
 
         }
 
-        WriteToFileService.updatePayment();
+        // WriteToFileService.updatePayment();
 
-
+        try {
+            WriteToFileService.paymentFileChannel.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
-    private void setPayment(boolean isDebtor, String depositNumber, BigDecimal amount) {
+    private void setPayment(boolean isDebtor, String depositNumber, BigDecimal amount) throws IOException {
 
         PaymentModel paymentModel = new PaymentModel(isDebtor, depositNumber, amount);
-        WriteToFileService writeToFileService = new WriteToFileService();
-        writeToFileService.addPayment(paymentModel);
+
+        WriteToFileService.writeFileChannelLine(paymentModel.toString(), WriteToFileService.paymentFileChannel);
 
 
     }
@@ -40,9 +51,8 @@ public class CalculationService {
 
 
         ReadDataService dataService = new ReadDataService();
-        List<PaymentModel> paymentModels = dataService.addPaymentData();
 
-        return paymentModels;
+        return dataService.addPaymentData();
     }
 
 

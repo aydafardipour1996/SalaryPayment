@@ -24,6 +24,19 @@ public class ReadDataService {
     static private final List<PaymentModel> paymentModels = new ArrayList<>();
     static Path pathPayment = Paths.get("data/Payment.txt");
     static Path pathDeposit = Paths.get("data/Deposit.txt");
+    static Path pathPosition = Paths.get("data/position.txt");
+
+    public static boolean paymentFileExists() {
+
+        return Files.exists(pathPayment);
+
+    }
+
+    public static void removePayments() throws IOException {
+
+        Files.delete(pathPayment);
+
+    }
 
     public String[] readFile(Path path) throws IOException {
         AsynchronousFileChannel channel = AsynchronousFileChannel.open(path, StandardOpenOption.READ);
@@ -37,7 +50,6 @@ public class ReadDataService {
         byte[] b = new byte[buffer.remaining()];
         buffer.get(b);
         String res = new String(b, StandardCharsets.UTF_8);
-       // System.out.println(res);
         String[] line = res.split("\\n");
 
         buffer.clear();
@@ -49,21 +61,35 @@ public class ReadDataService {
 
     public List<DepositModel> addDepositData() {
         String[] line = new String[0];
+        String[] position = new String[0];
         try {
             line = readFile(pathDeposit);
+            position = readFile(pathPosition);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        for (String s : line) {
+        for (int i = 0; i < line.length; i++) {
 
-            String[] stringArray = s.split("\\t");
-            depositModels.add(new DepositModel(stringArray[0], new BigDecimal(stringArray[1].replaceAll("\\s+", ""))));
+            String[] stringArray = line[i].split("\\t");
+            String[] pos = position[i].split("\\t");
+
+
+            depositModels.add(new DepositModel(stringArray[0], new BigDecimal(stringArray[1].replaceAll("\\s+", "")), Long.parseLong(pos[1].replaceAll("\\s+", ""))));
 
         }
 
         return depositModels;
 
     }
+/*
+
+    public int getPosition(String creditorNumber, String updatedData)  {
+
+
+
+
+    }
+*/
 
     public List<PaymentModel> addPaymentData() {
 
@@ -95,7 +121,6 @@ public class ReadDataService {
 
     }
 
-
     public BigDecimal getDebtorDeposit(String debtorNumber) throws NoDebtorFoundException {
 
         boolean found = false;
@@ -105,7 +130,7 @@ public class ReadDataService {
 
             if (Objects.equals(depositModel.getDepositNumber(), debtorNumber)) {
 
-                Deposit = depositModel.getAmount();
+                Deposit = depositModel.getDeposit();
                 found = true;
 
             }
