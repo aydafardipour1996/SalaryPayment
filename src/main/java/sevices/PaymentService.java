@@ -95,7 +95,7 @@ public class PaymentService {
                 WriteToFileService.updateFileChannelLine(depositModel.toString() + space + newLine, depositModel.getPosition());
                 WriteToFileService.writeFileChannelLine(depositModel.positionString(), WriteToFileService.positionFileChannel);
             }
-
+            setDebtorDeposit();
         } else {
             BigDecimal needs = amount.subtract(debtorDeposit);
             throw new InsufficientFundsException("not enough balance!! " + needs + " short!", needs);
@@ -151,7 +151,7 @@ public class PaymentService {
         }
 
         executor.shutdown();
-        setDebtorDeposit();
+
         WriteToFileService.closeChannels();
 
 

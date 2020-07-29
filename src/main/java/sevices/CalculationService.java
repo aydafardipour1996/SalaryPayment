@@ -8,8 +8,8 @@ import java.util.List;
 
 public class CalculationService {
 
-    public int limit = 20;
-    public int start = 10;
+    public int limit = 15;
+    public int start = 5;
 
     public void calculatePayments() throws IOException {
         if (ReadDataService.paymentFileExists()) {
