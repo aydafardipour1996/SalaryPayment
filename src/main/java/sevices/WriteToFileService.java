@@ -8,10 +8,10 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 
 public class WriteToFileService {
-    static Path pathTransaction = Paths.get("data/Transaction.txt");
-    static Path pathPayment = Paths.get("data/Payment.txt");
-    static Path pathDeposit = Paths.get("data/Deposit.txt");
-    static Path pathPosition = Paths.get("data/position.txt");
+    static Path pathTransaction = Paths.get("Transaction.txt");
+    static Path pathPayment = Paths.get("Payment.txt");
+    static Path pathDeposit = Paths.get("Deposit.txt");
+    static Path pathPosition = Paths.get("position.txt");
     static String newLine = System.getProperty("line.separator");
     static FileChannel transactionFileChannel;
     static FileChannel depositFileChannel;

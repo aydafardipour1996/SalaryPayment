@@ -22,9 +22,9 @@ public class ReadDataService {
 
     static private final List<DepositModel> depositModels = new ArrayList<>();
     static private final List<PaymentModel> paymentModels = new ArrayList<>();
-    static Path pathPayment = Paths.get("data/Payment.txt");
-    static Path pathDeposit = Paths.get("data/Deposit.txt");
-    static Path pathPosition = Paths.get("data/position.txt");
+    static Path pathPayment = Paths.get("Payment.txt");
+    static Path pathDeposit = Paths.get("Deposit.txt");
+    static Path pathPosition = Paths.get("position.txt");
 
     public static boolean paymentFileExists() {
 
@@ -81,15 +81,7 @@ public class ReadDataService {
         return depositModels;
 
     }
-/*
 
-    public int getPosition(String creditorNumber, String updatedData)  {
-
-
-
-
-    }
-*/
 
     public List<PaymentModel> addPaymentData() {
 
