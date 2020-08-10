@@ -49,11 +49,7 @@ public class DepositService {
 
     }
 
-    public List<DepositModel> getDeposits() {
 
-
-        return dataService.addDepositData();
-    }
 
 
 }

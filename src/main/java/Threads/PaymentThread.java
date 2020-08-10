@@ -2,6 +2,7 @@ package Threads;
 
 
 import exceptions.InsufficientFundsException;
+import exceptions.NoDebtorFoundException;
 import sevices.PaymentService;
 
 import java.io.IOException;
@@ -25,7 +26,7 @@ public class PaymentThread implements Runnable {
     public void run() {
         try {
             PaymentService.payDept(creditorNumber, amount);
-        } catch (InsufficientFundsException | IOException e) {
+        } catch (InsufficientFundsException | IOException | NoDebtorFoundException e) {
             e.printStackTrace();
         }
 

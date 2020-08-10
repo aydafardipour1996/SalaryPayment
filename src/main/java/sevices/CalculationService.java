@@ -52,7 +52,7 @@ public class CalculationService {
 
         ReadDataService dataService = new ReadDataService();
 
-        return dataService.addPaymentData();
+        return dataService.getPaymentData();
     }
 
 

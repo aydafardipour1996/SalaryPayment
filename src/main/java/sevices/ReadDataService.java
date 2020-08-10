@@ -1,6 +1,5 @@
 package sevices;
 
-import exceptions.NoDebtorFoundException;
 import model.DepositModel;
 import model.PaymentModel;
 
@@ -11,20 +10,18 @@ import java.nio.channels.AsynchronousFileChannel;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.Future;
+
+import static sevices.Constants.*;
 
 public class ReadDataService {
 
     static private final List<DepositModel> depositModels = new ArrayList<>();
     static private final List<PaymentModel> paymentModels = new ArrayList<>();
-    static Path pathPayment = Paths.get("Payment.txt");
-    static Path pathDeposit = Paths.get("Deposit.txt");
-    static Path pathPosition = Paths.get("position.txt");
 
     public static boolean paymentFileExists() {
 
@@ -38,8 +35,44 @@ public class ReadDataService {
 
     }
 
+    public static BigDecimal readDeposit(String depositNumber) throws IOException {
+
+        Optional<String> stringOptional = Files.lines(pathDeposit)
+                .filter(l -> l.startsWith(depositNumber))
+                .findFirst();
+
+        if (stringOptional.isPresent()) {
+
+            String[] line = stringOptional.get().split("\\t");
+
+            return new BigDecimal(line[1].replaceAll("\\s+", ""));
+        } else if (depositNumber.equals(PaymentService.debtorNumber)) {
+            return new BigDecimal(-1);
+        } else {
+            return BigDecimal.ZERO;
+        }
+    }
+
+    public static long readPosition(String depositNumber) throws IOException {
+
+        Optional<String> stringOptional = Files.lines(pathPosition)
+                .filter(l -> l.startsWith(depositNumber))
+                .findFirst();
+
+        if (stringOptional.isPresent()) {
+
+            String[] line = stringOptional.get().split("\\t");
+
+            return Long.parseLong(line[1].replaceAll("\\s+", ""));
+        } else {
+            return WriteToFileService.getPosition();
+
+        }
+
+    }
+
     public String[] readFile(Path path) throws IOException {
-        AsynchronousFileChannel channel = AsynchronousFileChannel.open(path, StandardOpenOption.READ);
+        AsynchronousFileChannel channel = AsynchronousFileChannel.open(path, StandardOpenOption.READ, StandardOpenOption.WRITE, StandardOpenOption.CREATE);
         ByteBuffer buffer = ByteBuffer.allocate((int) Files.size(path));
         Future<Integer> result = channel.read(buffer, 0);
         while (!result.isDone()) {
@@ -59,31 +92,8 @@ public class ReadDataService {
 
     }
 
-    public List<DepositModel> addDepositData() {
-        String[] line = new String[0];
-        String[] position = new String[0];
-        try {
-            line = readFile(pathDeposit);
-            position = readFile(pathPosition);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        for (int i = 0; i < line.length; i++) {
 
-            String[] stringArray = line[i].split("\\t");
-            String[] pos = position[i].split("\\t");
-
-
-            depositModels.add(new DepositModel(stringArray[0], new BigDecimal(stringArray[1].replaceAll("\\s+", "")), Long.parseLong(pos[1].replaceAll("\\s+", ""))));
-
-        }
-
-        return depositModels;
-
-    }
-
-
-    public List<PaymentModel> addPaymentData() {
+    public List<PaymentModel> getPaymentData() {
 
         String[] line = new String[0];
         try {
@@ -110,30 +120,6 @@ public class ReadDataService {
         }
 
         return paymentModels;
-
-    }
-
-    public BigDecimal getDebtorDeposit(String debtorNumber) throws NoDebtorFoundException {
-
-        boolean found = false;
-        BigDecimal Deposit = new BigDecimal(0);
-
-        for (DepositModel depositModel : depositModels) {
-
-            if (Objects.equals(depositModel.getDepositNumber(), debtorNumber)) {
-
-                Deposit = depositModel.getDeposit();
-                found = true;
-
-            }
-
-        }
-        if (!found) {
-
-            throw new NoDebtorFoundException("Debtor not found!!");
-        }
-
-        return Deposit;
 
     }
 

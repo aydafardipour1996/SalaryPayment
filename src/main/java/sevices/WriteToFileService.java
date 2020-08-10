@@ -3,16 +3,12 @@ package sevices;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 
+import static sevices.Constants.*;
+
 public class WriteToFileService {
-    static Path pathTransaction = Paths.get("Transaction.txt");
-    static Path pathPayment = Paths.get("Payment.txt");
-    static Path pathDeposit = Paths.get("Deposit.txt");
-    static Path pathPosition = Paths.get("position.txt");
-    static String newLine = System.getProperty("line.separator");
+
     static FileChannel transactionFileChannel;
     static FileChannel depositFileChannel;
     static FileChannel paymentFileChannel;
@@ -61,6 +57,7 @@ public class WriteToFileService {
 
 
     }
+
 
     public static void openPaymentChannel() throws IOException {
 
